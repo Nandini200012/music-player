@@ -1,0 +1,135 @@
+// ignore_for_file: must_be_immutable
+
+//import 'dart:io';
+
+//import 'package:favorite_button/favorite_button.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:musicplayer2/widgets/bottomsheet.dart';
+
+class PlayList extends StatelessWidget {
+  PlayList({super.key});
+
+  List<String> songSubtitle = [
+    'Justin Bieber',
+    'Selena Gomez',
+    'Taylor Swift',
+    'Selena Gomez',
+    'Taylor Swift',
+    'Ed Sheeran',
+    'Dua Lipa',
+    'BlackPInk',
+    'BTS',
+    'Charlie Puth'
+  ];
+  List<String> songTitle = [
+    'Baby',
+    'Calm Dowm',
+    'Never Ever',
+    'Heart wants what it wants',
+    'Love Story ',
+    'Shape of you',
+    'Levitating',
+    'crushing on you',
+    'BTS',
+    'Cheating OnYou'
+  ];
+  List<String> songImg = [
+    'assets/images/th (5).jpeg',
+    'assets/images/th (4).jpeg',
+    'assets/images/taylor.jpg',
+    'assets/images/selena.jpg',
+    'assets/images/taylor.jpg',
+    'assets/images/ed.jpg',
+    'assets/images/dua.jpg',
+    'assets/images/blackpink.jpg',
+    'assets/images/bts.jpg',
+    'assets/images/th (3).jpeg',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 700,
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+
+        // scrollDirection: Axis.vertical,
+        itemCount: songTitle.length,
+        itemBuilder: (BuildContext context, int index) {
+          return SizedBox(
+            height: 60,
+            child: ListTile(
+              minLeadingWidth: 1.0,
+              onTap: () {},
+              title: Text(
+                songTitle[index],
+                style: GoogleFonts.cutive(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500),
+              ),
+              subtitle: Text(
+                songSubtitle[index],
+                style: GoogleFonts.cutive(
+                    color: Colors.white54,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w400),
+              ),
+              leading: SizedBox(
+                height: 50,
+                width: 50,
+                child: Image.asset(
+                  songImg[index],
+                  fit: BoxFit.cover,
+                ),
+              ),
+              trailing: FittedBox(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // IconButton(
+                    //   onPressed: () {},
+                    //   iconSize: 18,
+                    //   icon: const Icon(Icons.share, color: Colors.white),
+                    // ),
+                    // FavoriteButton(
+                    //   isFavorite: true,
+                    //   iconSize: 28,
+                    //   iconColor: Colors.white,
+                    //   iconDisabledColor: Colors.white,
+                    //   valueChanged: (isFavorite) {
+                    //     stdout.write('Is Favorite : $isFavorite');
+                    //   },
+                    // ),
+                    // IconButton(
+                    //   onPressed: () {},
+                    //   iconSize: 18,
+                    //   icon: const Icon(Icons.favorite, color: Colors.white),
+                    // ),
+                    IconButton(
+                      onPressed: () {
+                        showbottomsheet(context);
+                      },
+                      iconSize: 18,
+                      icon: const Icon(Icons.more_vert, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+        separatorBuilder: (BuildContext context, int index) {
+          return Divider(
+            height: 5,
+            indent: 66.0,
+            endIndent: 26.0,
+            color: Colors.indigoAccent.shade400,
+          );
+        },
+      ),
+    );
+  }
+}

@@ -1,0 +1,13 @@
+import 'package:musicplayer2/category.temp';
+
+class CategoryOperations {
+  CategoryOperations._();
+  static List<category> getCategories() {
+    return <category>[
+      category('Popular Hits', 'assets/images/bts.jpg'),
+      category('Kpop songs', 'assets/images/blackpink.jpg'),
+      category('SenSational \nSid', 'assets/images/th (2).jpeg'),
+      category('Charlie \nPuth', 'assets/images/th (3).jpeg'),
+    ];
+  }
+}

@@ -1,0 +1,174 @@
+// ignore_for_file: unused_local_variable, must_be_immutable
+
+//import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:musicplayer2/category.temp';
+
+
+import 'package:musicplayer2/screens/playlist.dart';
+
+import 'package:musicplayer2/services/category_operations.dart';
+import 'package:musicplayer2/services/music_operations.dart';
+
+import '../music.dart';
+
+Widget createCategory(category category) {
+  return Container(
+    color: Colors.indigoAccent,
+    child: Row(
+      children: [
+        Image.asset(category.imageURL, fit: BoxFit.cover),
+        Padding(
+          padding: const EdgeInsets.only(left: 10),
+          child: Text(
+            category.name,
+            style: const TextStyle(color: Colors.white54),
+          ),
+        )
+      ],
+    ),
+  );
+}
+
+List<Widget> createListOfCategories() {
+  var CategoryOperations;
+  List<category> categoryList = CategoryOperations.getCategories();
+  List<Widget> categories = categoryList
+      .map((category category) => createCategory(category))
+      .toList();
+  return categories;
+}
+
+Widget createMusic(Music music) {
+  return Padding(
+    padding: const EdgeInsets.all(6),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 120,
+          width: 120,
+          child: Builder(builder: (context) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: InkWell(
+                onTap: () {
+                  //miniPlayerHome(songImg);
+                },
+                child: Image.asset(
+                  music.image,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            );
+          }),
+        ),
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Text(
+              music.name,
+              style: GoogleFonts.cuprum(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 15),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget createMusicList(String label) {
+  List<Music> musicList = MUsicOPerations.getMusic();
+  return Expanded(
+    child: SizedBox(
+      width: double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10.0, right: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Play Lists',
+              style: GoogleFonts.cuprum(
+                  color: Colors.white54,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700),
+            ),
+            SizedBox(
+              height: 170,
+              child: ListView.builder(
+                //padding: const EdgeInsets.all(5.0),
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (ctx, index) {
+                  return createMusic(musicList[index]);
+                },
+                itemCount: musicList.length,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+class Gridlist extends StatelessWidget {
+  const Gridlist({super.key});
+  // List gridtab = const [Favorites(), MostPlayed(), RecentlyPlayed(), Downloads()];
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (ctx) => const GridPlaylist()));
+      },
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        height: 200,
+        width: double.infinity,
+        child: GridView.count(
+            childAspectRatio: 5 / 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            // ignore: sort_child_properties_last
+            children: createListOfCategories(),
+            crossAxisCount: 2),
+      ),
+    );
+  }
+}
+
+
+
+
+
+
+
+
+
+// List gridtab = const [Favorites(), MostPlayed(), RecentlyPlayed(), Downloads()];
+// Widget createGrid() {
+//   // ignore: sort_child_properties_last
+//   return InkWell(
+//     onTap: () {
+//       Navigator.of(context)
+//                 .push(MaterialPageRoute(builder: (ctx) => libtab[index]));
+//     },
+//     child: Container(
+//       padding: const EdgeInsets.all(8.0),
+//       height: 200,
+//       child: GridView.count(
+//           childAspectRatio: 5 / 2,
+//           crossAxisSpacing: 10,
+//           mainAxisSpacing: 10,
+//           // ignore: sort_child_properties_last
+//           children: createListOfCategories(),
+//           crossAxisCount: 2),
+//     ),
+//   );
+// }

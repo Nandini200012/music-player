@@ -1,0 +1,245 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:music/colors/colors.dart';
+import 'package:music/db/recentlymodel.dart';
+import 'package:music/db/songmodel.dart';
+import 'package:music/screens/nowplayingslider.dart';
+import 'package:on_audio_query/on_audio_query.dart';
+
+import '../db/dbfunctions.dart';
+
+class AllSongsWidget extends StatefulWidget {
+  const AllSongsWidget({super.key});
+
+  @override
+  State<AllSongsWidget> createState() => _AllSongsWidgetState();
+}
+
+final OnAudioQuery audioQuery = OnAudioQuery();
+//final AudioPlayer player = AudioPlayer();
+final AssetsAudioPlayer player = AssetsAudioPlayer();
+
+class _AllSongsWidgetState extends State<AllSongsWidget> {
+  bool istaped = true;
+  bool isalready = true;
+  final box = SongBox.getInstance();
+
+  List<Audio> convertaudio = [];
+
+  @override
+  void initState() {
+    List<Songs> dbsongs = box.values.toList();
+
+    for (var item in dbsongs) {
+      convertaudio.add(Audio.file(item.songurl!,
+          metas: Metas(title: item.songname, id: item.id.toString())));
+    }
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    player.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        ValueListenableBuilder<Box<Songs>>(
+            valueListenable: box.listenable(),
+            builder: ((context, Box<Songs> allsongbox, child) {
+              List<Songs> alldbsongs = allsongbox.values.toList();
+              if (alldbsongs.isEmpty) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              //// ignore: unnecessary_null_comparison
+              // if (alldbsongs == null) {
+              //   return const Center(
+              //     child: CircularProgressIndicator(),
+              //   );
+              // }
+
+              return ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: alldbsongs.length,
+                itemBuilder: ((context, index) {
+                  RecentlyPlayed recsongs;
+                  Songs songs = alldbsongs[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8, left: 5),
+                    child: ListTile(
+                      onTap: () {
+                        player.open(Audio.file(alldbsongs[index].songurl!),
+                            showNotification: true);
+                        recsongs = RecentlyPlayed(
+                            id: songs.id,
+                            duration: songs.duration,
+                            songname: songs.songname,
+                            songurl: songs.songurl);
+                        NowPlayingSlider.enteredvalue.value = index;
+                        updateRecentlyPlayed(recsongs, index);
+                        print('Recently played passing data is ===$recsongs');
+                        print('value notifier passing index ===$index');
+                        print(index);
+                        print(alldbsongs[index].songname!);
+                      },
+                      leading: QueryArtworkWidget(
+                        id: alldbsongs[index].id!,
+                        type: ArtworkType.AUDIO,
+                        keepOldArtwork: true,
+                        artworkBorder: BorderRadius.circular(10),
+                      ),
+                      title: Text(
+                        alldbsongs[index].songname!,
+                        style: TextStyle(color: fontcolor),
+                      ),
+                      trailing: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  istaped = !istaped;
+                                });
+                                print(alldbsongs[index].songname!);
+                              },
+                              icon: Icon(Icons.favorite,
+                                  color: (istaped)
+                                      ? Color.fromARGB(255, 4, 26, 220)
+                                      : Color.fromARGB(255, 217, 213, 213))),
+                          IconButton(
+                              onPressed: () {
+                                showOptions(context, index);
+                              },
+                              icon: Icon(
+                                Icons.more_vert,
+                                color: iconcolor,
+                              ))
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              );
+            }))
+      ],
+    );
+  }
+
+  showOptions(BuildContext context, int index) {
+    double vertwidth = MediaQuery.of(context).size.width;
+    showDialog(
+      context: context,
+      builder: ((context) => StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+              insetPadding: EdgeInsets.zero,
+              contentPadding: EdgeInsets.zero,
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              backgroundColor: bgcolor,
+              alignment: Alignment.bottomCenter,
+              content: Container(
+                height: 250,
+                width: vertwidth,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextButton.icon(
+                          onPressed: () {
+                            // if (isalready) {
+                            //   addToFavorites(index, isalready);
+                            // }
+                            // setState(() {
+                            //   isalready = !isalready;
+                            // });
+                            // isalready = true;
+                            // Navigator.pop(context);
+                          },
+                          // icon: (checkFavoriteStatus(index, context))
+                          //     ? const Icon(
+                          //         Icons.favorite,
+                          //         color: iconcolor,
+                          //       )
+                          // : Icon(
+                          //     Icons.favorite_border_outlined,
+                          //     color: iconcolor,
+                          //   ),
+                          icon: Icon(
+                            Icons.favorite,
+                            color: iconcolor,
+                          ),
+                          label: Text(
+                            'Add to Favourites',
+                            style: TextStyle(fontSize: 17, color: fontcolor),
+                          )
+                          //     : Text(
+                          //(checkFavoriteStatus(index, context))
+                          //     ? Text(
+                          //         'Add to Favourites',
+                          //         style:
+                          //             TextStyle(fontSize: 17, color: fontcolor),
+                          //       )
+                          //     : Text(
+                          //         'Remove from Favourites',
+                          //         style:
+                          //             TextStyle(fontSize: 17, color: fontcolor),
+                          //       ),
+                          ),
+                      TextButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.playlist_add,
+                            color: iconcolor,
+                          ),
+                          label: Text(
+                            'Add to Playlist',
+                            style: TextStyle(fontSize: 17, color: fontcolor),
+                          )),
+                      TextButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.share,
+                            color: iconcolor,
+                          ),
+                          label: Text(
+                            'Share',
+                            style: TextStyle(fontSize: 17, color: fontcolor),
+                          )),
+                      TextButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.shuffle,
+                            color: iconcolor,
+                          ),
+                          label: Text(
+                            'Shuffle',
+                            style: TextStyle(fontSize: 17, color: fontcolor),
+                          )),
+                      TextButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.repeat,
+                            color: iconcolor,
+                          ),
+                          label: Text(
+                            'Repeat',
+                            style: TextStyle(fontSize: 17, color: fontcolor),
+                          )),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          })),
+    );
+  }
+}

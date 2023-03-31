@@ -1,0 +1,14 @@
+
+import 'package:musicplayer2/music.dart';
+
+class MUsicOPerations {
+  MUsicOPerations._();
+  static List<Music> getMusic() {
+    return <Music>[
+      Music('Popular Hits', 'assets/images/bts.jpg'),
+      Music('Kpop songs', 'assets/images/blackpink.jpg'),
+      Music('SenSational Sid', 'assets/images/th (2).jpeg'),
+      Music('Charlie Puth', 'assets/images/th (3).jpeg'),
+    ];
+  }
+}

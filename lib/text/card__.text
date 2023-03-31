@@ -1,0 +1,35 @@
+// Row(children: [
+            //   Padding(
+            //     padding: const EdgeInsets.only(left: 15.0),
+            //     child: Text(
+            //       'All Songs',
+            //       style: GoogleFonts.cuprum(
+            //           fontSize: 15,
+            //           fontWeight: FontWeight.w800,
+            //           color: Colors.white70),
+            //       textAlign: TextAlign.left,
+            //     ),
+            //   ),
+            // ]),
+            // const SizedBox(
+            //   height: 15,
+            // ),
+            // Column(
+            //   children: [
+            //     Row(
+            //       children: [
+            //         Container(
+            //           color: Colors.indigo.shade900,
+            //           height: 70,
+            //           width: 70,
+            //           child: Card(
+            //             child: ClipRRect(
+            //               //borderRadius: BorderRadius.circular(5),
+            //               child: Image.asset('assets/images/th (3).jpeg'),
+            //             ),
+            //           ),
+                      
+            //         ),
+            //         const Text('LOve story-Taylor SWift ')
+            //       ],
+            //     ),

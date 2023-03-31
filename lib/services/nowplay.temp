@@ -1,0 +1,329 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/container.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:music/colors/colors.dart';
+import 'package:music/db/songmodel.dart';
+import 'package:on_audio_query/on_audio_query.dart';
+
+class NowPlayingScreen extends StatefulWidget {
+  NowPlayingScreen({super.key});
+
+  List<Songs>? songs;
+  static int? indexvalue = 0;
+  static ValueNotifier<int> nowplayingindex = ValueNotifier<int>(indexvalue!);
+
+  @override
+  State<NowPlayingScreen> createState() => _NowPlayingScreenState();
+}
+
+final player = AssetsAudioPlayer.withId('0');
+//0 is the id of player player canbe reused but player with id 0 cant be reused
+
+class _NowPlayingScreenState extends State<NowPlayingScreen> {
+  final box = SongBox.getInstance();
+
+  @override
+  Widget build(BuildContext context) 
+  {
+    double vertwidth = MediaQuery.of(context).size.width;
+    double vertheight = MediaQuery.of(context).size.height;
+    Duration duration = Duration.zero;
+    Duration position = Duration.zero;
+
+    void initState() {
+      List<Songs> dbsongs = box.values.toList();
+
+      super.initState();
+    }
+
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: bgcolor,
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: SizedBox(
+                      // decoration: BoxDecoration(
+                      //     color: bordercolor,
+                      //     borderRadius: BorderRadius.circular(30)),
+                      width: 40,
+                      height: 40,
+                      child: IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: const Icon(
+                          Icons.expand_more,
+                          color: iconcolor,
+                          size: 35,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: vertwidth * 0.17),
+                    child: Text(
+                      'Now Playing',
+                      style: TextStyle(fontSize: 18, color: fontcolor),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+              ValueListenableBuilder(
+                valueListenable: NowPlayingScreen.nowplayingindex,
+                builder: (BuildContext context, int value1, child) {
+                  return ValueListenableBuilder<Box<Songs>>(
+                    valueListenable: box.listenable(),
+                    builder: ((context, Box<Songs> allsongbox, child) {
+                      List<Songs> allDbdongs = allsongbox.values.toList();
+
+                      if (allDbdongs.isEmpty) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (allDbdongs == null) {
+                        print('no songs');
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      return player.builderCurrent(
+                        builder: ((context, playing) {
+                          return Column(
+                            children: [
+                              QueryArtworkWidget(
+                                // quality: 100,
+                                artworkQuality: FilterQuality.high,
+                                artworkHeight: vertheight * 0.34,
+                                artworkWidth: vertheight * 0.34,
+                                artworkBorder: BorderRadius.circular(10),
+                                artworkFit: BoxFit.cover,
+                                id: allDbdongs[value1].id!,
+                                type: ArtworkType.AUDIO,
+                              ),
+                              const SizedBox(
+                                height: 50,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 12.0),
+                                        child: Text(
+                                          // player.getCurrentAudioTitle,
+
+                                          allDbdongs[value1].songname!,
+                                          style: TextStyle(
+                                              fontSize: 18, color: fontcolor),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.favorite_border_outlined,
+                                      color: iconcolor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Column(
+                                children: [
+                                  PlayerBuilder.realtimePlayingInfos(
+                                    player: player,
+                                    builder: (context, RealtimePlayingInfos) {
+                                      duration = RealtimePlayingInfos
+                                          .current!.audio.duration;
+                                      position =
+                                          RealtimePlayingInfos.currentPosition;
+
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 10, right: 10),
+                                            child: ProgressBar(
+                                          baseBarColor:
+                                              Colors.white.withOpacity(0.5),
+                                          progressBarColor:
+                                              Color.fromARGB(255, 89, 4, 173),
+                                          thumbColor:
+                                              Color.fromARGB(255, 24, 14, 14),
+                                          thumbRadius: 5,
+                                          timeLabelPadding: 5,
+                                          progress: position,
+                                          timeLabelTextStyle: const TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                          total: duration,
+                                          onSeek: (duration) async {
+                                            await player.seek(duration);
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  PlayerBuilder.isPlaying(
+                                    player: player,
+                                    builder: ((context, isPlaying) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(15.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            IconButton(
+                                                onPressed: () {},
+                                                icon: const Icon(
+                                                  Icons.shuffle,
+                                                  color: iconcolor,
+                                                )),
+                                            SizedBox(
+                                              width: 50,
+                                              height: 50,
+                                              // decoration: BoxDecoration(
+                                              //   color: bordercolor,
+                                              //   borderRadius:
+                                              //       BorderRadius.circular(30),
+                                              // ),
+                                              child: IconButton(
+                                                onPressed: () {
+                                                 skipMusic(player, value1,
+                                                      allDbdongs);
+                                                },
+                                                icon: const Icon(
+                                                  Icons.skip_previous,
+                                                  color: iconcolor,
+                                                  size: 35,
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              width: 70,
+                                              height: 70,
+                                              decoration: BoxDecoration(
+                                                color: appbarcolor,
+                                                borderRadius:
+                                                    BorderRadius.circular(35),
+                                              ),
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  if (isPlaying) {
+                                                    player.pause();
+                                                  } else {
+                                                    player.play();
+                                                  }
+                                                  setState(
+                                                    () {
+                                                      isPlaying = !isPlaying;
+                                                    },
+                                                  );
+                                                },
+                                                icon: (isPlaying)
+                                                    ? Icon(Icons.pause)
+                                                    : Icon(
+                                                        Icons.play_arrow,
+                                                        color: iconcolor,
+                                                        size: 35,
+                                                      ),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 50,
+                                              height: 50,
+                                              // decoration: BoxDecoration(
+                                              //   color: bordercolor,
+                                              //   borderRadius:
+                                              //       BorderRadius.circular(30),
+                                              // ),
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  skipMusic(player, value1,
+                                                      allDbdongs);
+                                                  setState(() {});
+                                                },
+                                                icon: const Icon(
+                                                  Icons.skip_next,
+                                                  color: iconcolor,
+                                                  size: 35,
+                                                ),
+                                              ),
+                                            ),
+                                            IconButton(
+                                              onPressed: () {},
+                                              icon: const Icon(
+                                                Icons.repeat,
+                                                color: iconcolor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        }),
+                      );
+                    }),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void skipMusic(AssetsAudioPlayer assetsAudioPlayer, int index,
+      List<Songs> dbsongs) async {
+    player.open(
+      Audio.file(dbsongs[index + 1].songurl!),
+    );
+    // await _audioPlayer.next();
+    setState(() {
+      NowPlayingScreen.nowplayingindex.value++;
+    });
+    await player.stop();
+  }
+
+  void previousSong(AssetsAudioPlayer assetsAudioPlayer, int index,
+      List<Songs> dbsongs) async {
+    player.open(
+      Audio.file(dbsongs[index - 1].songurl!),
+    );
+    // await _audioPlayer.next();
+    setState(() {
+      NowPlayingScreen.nowplayingindex.value--;
+    });
+    await player.stop();
+  }
+}

@@ -1,0 +1,185 @@
+import 'package:flutter/material.dart';
+
+
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:hive_flutter/adapters.dart';
+
+import 'package:musicplayer2/models/songmodel.dart';
+import 'package:on_audio_query/on_audio_query.dart';
+
+class NowPlayingSlider extends StatefulWidget {
+  const NowPlayingSlider({super.key});
+
+  static int? index = 0;
+  static ValueNotifier<int> enteredvalue = ValueNotifier<int>(index!);
+
+  @override
+  State<NowPlayingSlider> createState() => _NowPlayingSliderState();
+}
+
+final AssetsAudioPlayer player = AssetsAudioPlayer.withId('0');
+
+class _NowPlayingSliderState extends State<NowPlayingSlider> {
+  final box = SongBox.getInstance();
+
+  List<Audio> convertaudio = [];
+  @override
+  void initState() {
+    List<Songs> dbsongs = box.values.toLisem.songname, id: item.id.toString())));
+    }
+    player.open(
+      Playlist(audios: convertaudio),
+      showNotification: true,
+      headPhoneStrategy: HeadPhoneStrategy.pauseOnUnplugPlayOnPlug,
+    );
+    super.initState();
+  }t();
+    for (var item in dbsongs) {
+      convertaudio.add(Audio.file(item.songurl!,
+          metas: Metas(title: it
+
+  @override
+  void dispose() {
+    player.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // void initState() {
+    //   List<Songs> dbsongs = box.values.toList();
+    //   for (var item in dbsongs) {
+    //     convertaudio.add(Audio.file(item.songurl!,
+    //         metas: Metas(title: item.songname, id: item.id.toString())));
+    //   }
+    //   player.open(
+    //     Playlist(audios: convertaudio),
+    //     showNotification: true,
+    //     headPhoneStrategy: HeadPhoneStrategy.pauseOnUnplugPlayOnPlug,
+    //   );
+    //   super.initState();
+    // }
+
+    double vertwidth = MediaQuery.of(context).size.width;
+    double vertheight = MediaQuery.of(context).size.height;
+
+    return ValueListenableBuilder(
+        valueListenable: NowPlayingSlider.enteredvalue,
+        builder: ((BuildContext context, int value, child) {
+          print('entered value index is == $value');
+          return ValueListenableBuilder(
+            valueListenable: box.listenable(),
+            builder: ((context, Box<Songs> allsongbox, child) {
+              List<Songs> alldbsongs = allsongbox.values.toList();
+              if (alldbsongs.isEmpty) {
+                print('no songs in slider db');
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              return GestureDetector(
+                onTap: () {
+                  NowPlayingScreen.nowplayingindex.value = value;
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NowPlayingScreen(),
+                      ));
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: bgcolor, borderRadius: BorderRadius.circular(5)),
+                  width: vertwidth,
+                  height: 65,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      QueryArtworkWidget(
+                        quality: 100,
+                        artworkWidth: vertwidth * 0.16,
+                        artworkHeight: vertheight * 0.16,
+                        keepOldArtwork: true,
+                        artworkBorder: BorderRadius.circular(10),
+                        id: alldbsongs[value].id!,
+                        type: ArtworkType.AUDIO,
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: vertwidth * 0.5,
+                            child: Text(
+                              alldbsongs[value].songname!,
+                              style: TextStyle(fontSize: 18, color: fontcolor),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      PlayerBuilder.isPlaying(
+                          player: player,
+                          builder: ((context, isPlaying) {
+                            return Padding(
+                              padding: EdgeInsets.only(right: vertwidth * 0.01),
+                              child: Wrap(
+                                spacing: 10,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    height: 50,
+                                    width: 50,
+                                    // decoration: BoxDecoration(
+                                    //     borderRadius: BorderRadius.circular(30),
+                                    //     color: bordercolor),
+                                    child: IconButton(
+                                        onPressed: () async {
+                                          await player.playOrPause();
+                                          setState(() {
+                                            isPlaying = !isPlaying;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          (isPlaying)
+                                              ? Icons.pause
+                                              : Icons.play_arrow,
+                                          color: iconcolor,
+                                          size: 30,
+                                        )),
+                                  ),
+                                  SizedBox(
+                                    width: 35,
+                                    height: 50,
+                                    // decoration: BoxDecoration(
+                                    //     borderRadius: BorderRadius.circular(30),
+                                    //     color: bordercolor),
+                                    child: IconButton(
+                                        onPressed: () {
+                                          skipMusic(player, value, alldbsongs);
+                                        },
+                                        icon: const Icon(Icons.skip_next,
+                                            color: iconcolor, size: 30)),
+                                  )
+                                ],
+                              ),
+                            );
+                          }))
+                    ],
+                  ),
+                ),
+              );
+            }),
+          );
+        }));
+  }
+
+  void skipMusic(AssetsAudioPlayer assetsAudioPlayer, int index,
+      List<Songs> dbsongs) async {
+    player.open(
+      Audio.file(dbsongs[index + 1].songurl!),
+    );
+    setState(() {
+      NowPlayingSlider.enteredvalue.value++;
+    });
+    await player.stop();
+  }

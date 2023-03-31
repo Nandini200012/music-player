@@ -1,0 +1,188 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+Future<void> showbottomsheet(BuildContext ctx) async {
+  showModalBottomSheet(
+      context: ctx,
+      builder: (ctx1) {
+        return Container(
+          height: 300,
+          color: Colors.indigo.shade900,
+          child: Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.arrow_left,
+                          size: 40,
+                          color: Colors.white,
+                        )),
+                    const Text(
+                      'Play Previous',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.arrow_right,
+                          size: 40,
+                          color: Colors.white,
+                        )),
+                    const Text(
+                      'Play Next',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.library_add,
+                          color: Colors.white,
+                        )),
+                    const Text(
+                      'Add to playlist',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.download,
+                          color: Colors.white,
+                        )),
+                    const Text(
+                      'Download',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.favorite,
+                          color: Colors.white,
+                        )),
+                    const Text(
+                      'Add to Favourties',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      });
+}
+
+Future<void> createshowbottomsheet(BuildContext ctx) async {
+  showModalBottomSheet(
+      context: ctx,
+      builder: (ctx1) {
+        return Container(
+          color: Colors.indigo.shade900,
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 50,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(color: Colors.white70),
+                  decoration: InputDecoration(
+                      label: Padding(
+                        padding: const EdgeInsets.only(left: 20.0),
+                        child: Text(
+                          'Playlist List',
+                          style: GoogleFonts.cuprum(
+                              color: Colors.indigoAccent.shade100),
+                        ),
+                      ),
+                      suffixIcon: Icon(
+                        Icons.edit,
+                        color: Colors.indigoAccent.shade100,
+                      )),
+                ),
+              ),
+              const SizedBox(
+                height: 50,
+              ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  color: Colors.indigoAccent,
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.save,
+                              color: Colors.white,
+                            )),
+                        const Text(
+                          'Save',
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  color: Colors.indigoAccent,
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.cancel,
+                              color: Colors.white,
+                            )),
+                        const Text(
+                          'Cancel',
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      });
+}
